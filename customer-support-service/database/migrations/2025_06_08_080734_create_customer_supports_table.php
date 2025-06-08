@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('customer_supports', function (Blueprint $table) {
-            $table->id(); 
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); 
-            $table->foreignId('booking_id')->nullable()->constrained()->onDelete('set null');
+            $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('booking_id')->nullable();
             $table->text('issue');
-            $table->enum('status', ['open', 'in_progress', 'closed'])->default('open'); 
-            $table->timestamp('resolved_at')->nullable(); 
-            $table->timestamps(); 
+            $table->enum('status', ['open', 'in_progress', 'closed'])->default('open');
+            $table->timestamp('resolved_at')->nullable();
+            $table->timestamps();
         });
     }
 
