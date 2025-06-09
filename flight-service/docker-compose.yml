@@ -1,0 +1,85 @@
+# version: '3'
+
+networks:
+    iae_shared_network:
+        external: true
+
+services:
+    flight_nginx_proxy:
+        image: jwilder/nginx-proxy
+        container_name: flight_nginx_proxy
+        ports:
+            - "8088:80"
+        volumes:
+            - /var/run/docker.sock:/tmp/docker.sock:ro
+        networks:
+            - iae_shared_network
+
+    flight_web:
+        build:
+            context: ./
+            dockerfile: docker/dev/web.docker
+        container_name: flight_nginx
+        # ports:
+        #     - "8084:80"
+        volumes:
+            - ./:/var/www
+        depends_on:
+            - flight_app
+        environment:
+            - VIRTUAL_HOST=api.flight.test
+        networks:
+            - iae_shared_network
+
+    flight_app:
+        build:
+            context: ./
+            dockerfile: docker/dev/app.docker
+        container_name: flight_app
+        volumes:
+            - ./:/var/www
+        depends_on:
+            - flight_db
+            - flight_cache
+        environment:
+            - REDIS_PORT=6379
+            - REDIS_HOST=flight_cache
+        networks:
+            - iae_shared_network
+
+    flight_db:
+        image: mysql:8.2
+        container_name: flight_db
+        environment:
+            - MYSQL_ROOT_PASSWORD=123
+            - MYSQL_DATABASE=db_flight
+        ports:
+            - "33066:3306"
+        volumes:
+            - flight_data:/var/lib/mysql
+        networks:
+            - iae_shared_network
+
+    flight_cache:
+        image: redis:latest
+        container_name: flight_cache
+        ports:
+            - "63796:6379"
+        networks:
+            - iae_shared_network
+
+    flight_phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: flight_phpmyadmin
+        depends_on:
+            - flight_db
+        environment:
+            - PMA_HOST=flight_db
+            - PMA_USER=root
+            - PMA_PASSWORD=123
+            - VIRTUAL_HOST=pma.flight.test
+        networks:
+            - iae_shared_network
+
+volumes:
+    flight_data:
