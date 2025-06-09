@@ -4,11 +4,32 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\CustomerSupport;
-use GuzzleHttp\Client;
+use App\Services\ComplaintService;
+use App\Services\NotificationService;
+use App\Services\UserService;
+use App\Services\BookingService;
 use Illuminate\Http\Request;
 
 class CustomerSupportController extends Controller
 {
+    protected $complaintService;
+    protected $notificationService;
+    protected $userService;
+    protected $bookingService;
+
+    public function __construct(
+        ComplaintService $complaintService,
+        NotificationService $notificationService,
+        UserService $userService,
+        BookingService $bookingService
+    )
+    {
+        $this->complaintService = $complaintService;
+        $this->notificationService = $notificationService;
+        $this->userService = $userService;
+        $this->bookingService = $bookingService;
+    }
+
     // Menampilkan semua tiket
     public function index()
     {
@@ -44,14 +65,9 @@ class CustomerSupportController extends Controller
         ]);
 
         // Validasi user_id dengan UserService
-        $client = new Client();
-        try {
-            $userResponse = $client->get("http://127.0.0.1:8001/api/users/{$data['user_id']}");
-            if ($userResponse->getStatusCode() != 200) {
-                return response()->json(['message' => 'User not found'], 404);
-            }
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Error communicating with UserService', 'error' => $e->getMessage()], 500);
+        $user = $this->userService->getUser($data['user_id']);
+        if (!$user) {
+            return response()->json(['message' => 'User not found or UserService error'], 404);
         }
 
         // Daftar masalah yang mungkin terjadi
@@ -72,20 +88,34 @@ class CustomerSupportController extends Controller
 
         // Komunikasi dengan BookingService untuk validasi booking_id
         if (!empty($data['booking_id'])) {
-            $client = new Client();
-            try {
-                $response = $client->get("http://127.0.0.1:8003/api/bookings/{$data['booking_id']}"); 
-                if ($response->getStatusCode() != 200) {
-                    return response()->json(['message' => 'Booking not found'], 404);
-                }
-                $bookingData = json_decode($response->getBody(), true);
-            } catch (\Exception $e) {
-                return response()->json(['message' => 'Error communicating with BookingService', 'error' => $e->getMessage()], 500);
+            $booking = $this->bookingService->getBooking($data['booking_id']);
+            if (!$booking) {
+                return response()->json(['message' => 'Booking not found or BookingService error'], 404);
             }
         }
 
         // Simpan tiket dukungan
         $ticket = CustomerSupport::create($data);
+
+        // Contoh: Mengirim notifikasi setelah keluhan dibuat (opsional, tergantung alur bisnis)
+        // Asumsi notifikasi dikirim ke user yang membuat keluhan
+        $this->notificationService->sendNotification([
+            'recipient_id' => $data['user_id'], // Sesuaikan dengan ID penerima di NotificationService
+            'message' => 'Your complaint for issue "' . $issues[$data['issue']] . '" has been received and is being processed.',
+            'type' => 'complaint_received'
+        ]);
+
+        // Contoh: Jika ada kebutuhan untuk mengirim keluhan ke ComplaintService
+        // Ini mungkin duplikasi jika CustomerSupport sudah menangani inti keluhan.
+        // Tapi jika ComplaintService adalah sistem terpisah untuk tracking keluhan, maka ini relevan.
+        $complaintExternalData = [
+            'ticket_id' => $ticket->id, // ID tiket dari CustomerSupport
+            'user_id' => $data['user_id'],
+            'issue_description' => $data['issue_description'],
+            'status' => $data['status'],
+            // Tambahkan data lain yang relevan untuk ComplaintService
+        ];
+        $this->complaintService->createComplaint($complaintExternalData);
 
         return response()->json([
             'message' => 'Ticket created',

@@ -54,7 +54,7 @@ services:
             - MYSQL_ROOT_PASSWORD=123
             - MYSQL_DATABASE=db_user
         ports:
-            - "33066:3306"
+            - "33067:3306"
         volumes:
             - user_data:/var/lib/mysql
         networks:
@@ -64,7 +64,7 @@ services:
         image: redis:latest
         container_name: user_cache
         ports:
-            - "63796:6379"
+            - "63795:6379"
         networks:
             - iae_shared_network
 
