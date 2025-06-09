@@ -1,0 +1,85 @@
+# version: '3'
+
+networks:
+    iae_shared_network:
+        external: true
+
+services:
+    booking_nginx_proxy:
+        image: jwilder/nginx-proxy
+        container_name: booking_nginx_proxy
+        ports:
+            - "8090:80"
+        volumes:
+            - /var/run/docker.sock:/tmp/docker.sock:ro
+        networks:
+            - iae_shared_network
+
+    booking_web:
+        build:
+            context: ./
+            dockerfile: docker/dev/web.docker
+        container_name: booking_nginx
+        # ports:
+        #     - "8084:80"
+        volumes:
+            - ./:/var/www
+        depends_on:
+            - booking_app
+        environment:
+            - VIRTUAL_HOST=api.booking.test
+        networks:
+            - iae_shared_network
+
+    booking_app:
+        build:
+            context: ./
+            dockerfile: docker/dev/app.docker
+        container_name: booking_app
+        volumes:
+            - ./:/var/www
+        depends_on:
+            - booking_db
+            - booking_cache
+        environment:
+            - REDIS_PORT=6379
+            - REDIS_HOST=booking_cache
+        networks:
+            - iae_shared_network
+
+    booking_db:
+        image: mysql:8.2
+        container_name: booking_db
+        environment:
+            - MYSQL_ROOT_PASSWORD=123
+            - MYSQL_DATABASE=db_booking
+        ports:
+            - "33066:3306"
+        volumes:
+            - booking_data:/var/lib/mysql
+        networks:
+            - iae_shared_network
+
+    booking_cache:
+        image: redis:latest
+        container_name: booking_cache
+        ports:
+            - "63796:6379"
+        networks:
+            - iae_shared_network
+
+    booking_phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: booking_phpmyadmin
+        depends_on:
+            - booking_db
+        environment:
+            - PMA_HOST=booking_db
+            - PMA_USER=root
+            - PMA_PASSWORD=123
+            - VIRTUAL_HOST=pma.booking.test
+        networks:
+            - iae_shared_network
+
+volumes:
+    booking_data:

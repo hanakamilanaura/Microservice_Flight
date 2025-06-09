@@ -1,0 +1,85 @@
+# version: '3'
+
+networks:
+    iae_shared_network:
+        external: true
+
+services:
+    cs_nginx_proxy:
+        image: jwilder/nginx-proxy
+        container_name: cs_nginx_proxy
+        ports:
+            - "8091:80"
+        volumes:
+            - /var/run/docker.sock:/tmp/docker.sock:ro
+        networks:
+            - iae_shared_network
+
+    cs_web:
+        build:
+            context: ./
+            dockerfile: docker/dev/web.docker
+        container_name: cs_nginx
+        # ports:
+        #     - "8084:80"
+        volumes:
+            - ./:/var/www
+        depends_on:
+            - cs_app
+        environment:
+            - VIRTUAL_HOST=api.cs.test
+        networks:
+            - iae_shared_network
+
+    cs_app:
+        build:
+            context: ./
+            dockerfile: docker/dev/app.docker
+        container_name: cs_app
+        volumes:
+            - ./:/var/www
+        depends_on:
+            - cs_db
+            - cs_cache
+        environment:
+            - REDIS_PORT=6379
+            - REDIS_HOST=cs_cache
+        networks:
+            - iae_shared_network
+
+    cs_db:
+        image: mysql:8.2
+        container_name: cs_db
+        environment:
+            - MYSQL_ROOT_PASSWORD=123
+            - MYSQL_DATABASE=db_cs
+        ports:
+            - "33066:3306"
+        volumes:
+            - cs_data:/var/lib/mysql
+        networks:
+            - iae_shared_network
+
+    cs_cache:
+        image: redis:latest
+        container_name: cs_cache
+        ports:
+            - "63796:6379"
+        networks:
+            - iae_shared_network
+
+    cs_phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: cs_phpmyadmin
+        depends_on:
+            - cs_db
+        environment:
+            - PMA_HOST=cs_db
+            - PMA_USER=root
+            - PMA_PASSWORD=123
+            - VIRTUAL_HOST=pma.cs.test
+        networks:
+            - iae_shared_network
+
+volumes:
+    cs_data:
