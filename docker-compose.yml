@@ -1,0 +1,170 @@
+version: '3.8'
+
+networks:
+    iae_shared_network:
+        external: true
+
+services:
+    nginx_proxy:
+        image: jwilder/nginx-proxy
+        container_name: global_nginx_proxy
+        ports:
+            - "80:80"
+        volumes:
+            - /var/run/docker.sock:/tmp/docker.sock:ro
+        networks:
+            - iae_shared_network
+
+    # Include other services from their respective docker-compose.yml files
+    # These services will need to be explicitly defined as external networks
+    # or be part of the same network as the nginx_proxy
+
+    # Booking Service
+    booking_web:
+        extends:
+            file: ./booking-service/docker-compose.yml
+            service: booking_web
+        networks:
+            - iae_shared_network
+
+    booking_app:
+        extends:
+            file: ./booking-service/docker-compose.yml
+            service: booking_app
+        networks:
+            - iae_shared_network
+
+    booking_db:
+        extends:
+            file: ./booking-service/docker-compose.yml
+            service: booking_db
+        networks:
+            - iae_shared_network
+
+    booking_cache:
+        extends:
+            file: ./booking-service/docker-compose.yml
+            service: booking_cache
+        networks:
+            - iae_shared_network
+
+    booking_phpmyadmin:
+        extends:
+            file: ./booking-service/docker-compose.yml
+            service: booking_phpmyadmin
+        networks:
+            - iae_shared_network
+
+    # Flight Service
+    flight_web:
+        extends:
+            file: ./flight-service/docker-compose.yml
+            service: flight_web
+        networks:
+            - iae_shared_network
+
+    flight_app:
+        extends:
+            file: ./flight-service/docker-compose.yml
+            service: flight_app
+        networks:
+            - iae_shared_network
+
+    flight_db:
+        extends:
+            file: ./flight-service/docker-compose.yml
+            service: flight_db
+        networks:
+            - iae_shared_network
+
+    flight_cache:
+        extends:
+            file: ./flight-service/docker-compose.yml
+            service: flight_cache
+        networks:
+            - iae_shared_network
+
+    flight_phpmyadmin:
+        extends:
+            file: ./flight-service/docker-compose.yml
+            service: flight_phpmyadmin
+        networks:
+            - iae_shared_network
+
+    # User Service
+    user_web:
+        extends:
+            file: ./user-service/docker-compose.yml
+            service: user_web
+        networks:
+            - iae_shared_network
+
+    user_app:
+        extends:
+            file: ./user-service/docker-compose.yml
+            service: user_app
+        networks:
+            - iae_shared_network
+
+    user_db:
+        extends:
+            file: ./user-service/docker-compose.yml
+            service: user_db
+        networks:
+            - iae_shared_network
+
+    user_cache:
+        extends:
+            file: ./user-service/docker-compose.yml
+            service: user_cache
+        networks:
+            - iae_shared_network
+
+    user_phpmyadmin:
+        extends:
+            file: ./user-service/docker-compose.yml
+            service: user_phpmyadmin
+        networks:
+            - iae_shared_network
+
+    # Customer Support Service
+    cs_web:
+        extends:
+            file: ./customer-support-service/docker-compose.yml
+            service: cs_web
+        networks:
+            - iae_shared_network
+
+    cs_app:
+        extends:
+            file: ./customer-support-service/docker-compose.yml
+            service: cs_app
+        networks:
+            - iae_shared_network
+
+    cs_db:
+        extends:
+            file: ./customer-support-service/docker-compose.yml
+            service: cs_db
+        networks:
+            - iae_shared_network
+
+    cs_cache:
+        extends:
+            file: ./customer-support-service/docker-compose.yml
+            service: cs_cache
+        networks:
+            - iae_shared_network
+
+    cs_phpmyadmin:
+        extends:
+            file: ./customer-support-service/docker-compose.yml
+            service: cs_phpmyadmin
+        networks:
+            - iae_shared_network 
+
+volumes:
+    booking_data:
+    flight_data:
+    user_data:
+    cs_data: 

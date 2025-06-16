@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\BookingController;
+use App\GraphQL\Controller\GraphQLController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,3 +16,5 @@ use App\Http\Controllers\Api\BookingController;
 */
 
 Route::apiResource('bookings', BookingController::class);
+
+Route::post('/graphql', [GraphQLController::class, 'handle']);

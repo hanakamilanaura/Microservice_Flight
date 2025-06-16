@@ -6,8 +6,6 @@ const custSupportTypeDefs = gql`
     user_id: Int!
     subject: String!
     description: String!
-    status: String!
-    priority: String!
     created_at: String!
     updated_at: String!
     assigned_to: Int
@@ -27,8 +25,6 @@ const custSupportTypeDefs = gql`
     getAllTickets: [SupportTicket]
     getTicketById(id: ID!): SupportTicket
     getTicketsByUserId(userId: ID!): [SupportTicket]
-    getTicketsByStatus(status: String!): [SupportTicket]
-    getTicketsByPriority(priority: String!): [SupportTicket]
     getTicketResponses(ticketId: ID!): [SupportResponse]
   }
 
@@ -36,8 +32,6 @@ const custSupportTypeDefs = gql`
     createTicket(
       user_id: Int!
       subject: String!
-      description: String!
-      priority: String!
       category: String!
     ): SupportTicket
 
@@ -45,8 +39,6 @@ const custSupportTypeDefs = gql`
       id: ID!
       subject: String
       description: String
-      status: String
-      priority: String
       category: String
       assigned_to: Int
     ): String

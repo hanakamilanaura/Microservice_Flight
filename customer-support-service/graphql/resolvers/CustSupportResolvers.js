@@ -34,30 +34,6 @@ const custSupportResolvers = {
         );
       });
     },
-    getTicketsByStatus: (_, { status }) => {
-      return new Promise((resolve, reject) => {
-        db.query(
-          "SELECT * FROM support_tickets WHERE status = ?",
-          [status],
-          (err, results) => {
-            if (err) reject(err);
-            resolve(results);
-          }
-        );
-      });
-    },
-    getTicketsByPriority: (_, { priority }) => {
-      return new Promise((resolve, reject) => {
-        db.query(
-          "SELECT * FROM support_tickets WHERE priority = ?",
-          [priority],
-          (err, results) => {
-            if (err) reject(err);
-            resolve(results);
-          }
-        );
-      });
-    },
     getTicketResponses: (_, { ticketId }) => {
       return new Promise((resolve, reject) => {
         db.query(
@@ -73,14 +49,14 @@ const custSupportResolvers = {
   },
 
   Mutation: {
-    createTicket: (_, { user_id, subject, description, priority, category }) => {
+    createTicket: (_, { user_id, subject, description, category }) => {
       return new Promise((resolve, reject) => {
         const now = new Date().toISOString();
         const query =
-          "INSERT INTO support_tickets (user_id, subject, description, status, priority, created_at, updated_at, category) VALUES (?, ?, ?, 'OPEN', ?, ?, ?, ?)";
+          "INSERT INTO support_tickets (user_id, subject, description, created_at, updated_at, category) VALUES (?, ?, ?, ?, ?, ?)";
         db.query(
           query,
-          [user_id, subject, description, priority, now, now, category],
+          [user_id, subject, description, now, now, category],
           (err, results) => {
             if (err) reject(err);
             resolve({
@@ -88,8 +64,6 @@ const custSupportResolvers = {
               user_id,
               subject,
               description,
-              status: 'OPEN',
-              priority,
               created_at: now,
               updated_at: now,
               category,
@@ -98,7 +72,7 @@ const custSupportResolvers = {
         );
       });
     },
-    updateTicket: (_, { id, subject, description, status, priority, category, assigned_to }) => {
+    updateTicket: (_, { id, subject, description, category, assigned_to }) => {
       return new Promise((resolve, reject) => {
         const updates = [];
         const values = [];
@@ -110,14 +84,6 @@ const custSupportResolvers = {
         if (description !== undefined) {
           updates.push("description = ?");
           values.push(description);
-        }
-        if (status !== undefined) {
-          updates.push("status = ?");
-          values.push(status);
-        }
-        if (priority !== undefined) {
-          updates.push("priority = ?");
-          values.push(priority);
         }
         if (category !== undefined) {
           updates.push("category = ?");
@@ -170,13 +136,7 @@ const custSupportResolvers = {
     },
     closeTicket: (_, { id }) => {
       return new Promise((resolve, reject) => {
-        const now = new Date().toISOString();
-        const query = "UPDATE support_tickets SET status = 'CLOSED', updated_at = ? WHERE ticket_id = ?";
-        db.query(query, [now, id], (err, results) => {
-          if (err) reject("Closure failed");
-          if (results.affectedRows === 0) reject("Ticket not found");
-          resolve("Ticket closed successfully");
-        });
+        reject("Close ticket feature not available");
       });
     },
     deleteTicket: (_, { id }) => {

@@ -11,7 +11,6 @@ class CustomerSupport extends Model
         'user_id',
         'booking_id',
         'issue',
-        'status',
         'created_at',
         'resolved_at',  
     ];

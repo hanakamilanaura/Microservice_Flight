@@ -5,16 +5,6 @@ networks:
         external: true
 
 services:
-    user_nginx_proxy:
-        image: jwilder/nginx-proxy
-        container_name: user_nginx_proxy
-        ports:
-            - "8089:80"
-        volumes:
-            - /var/run/docker.sock:/tmp/docker.sock:ro
-        networks:
-            - iae_shared_network
-
     user_web:
         build:
             context: ./
