@@ -11,7 +11,6 @@ class Booking extends Model
         'user_id',
         'flight_id',
         'ticket_quantity',
-        // 'status',
         'total_price',
     ];
 }

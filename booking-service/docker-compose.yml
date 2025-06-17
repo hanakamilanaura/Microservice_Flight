@@ -39,7 +39,7 @@ services:
             - DB_PORT=3306
             - DB_DATABASE=db_booking
             - DB_USERNAME=root
-            - DB_PASSWORD=123
+            - DB_PASSWORD=
         networks:
             - iae_shared_network
 
@@ -47,7 +47,7 @@ services:
         image: mysql:8.2
         container_name: booking_db
         environment:
-            - MYSQL_ROOT_PASSWORD=123
+            - MYSQL_ROOT_PASSWORD=
             - MYSQL_DATABASE=db_booking
         ports:
             - "33069:3306"
@@ -72,7 +72,7 @@ services:
         environment:
             - PMA_HOST=booking_db
             - PMA_USER=root
-            - PMA_PASSWORD=123
+            - PMA_PASSWORD=
             - VIRTUAL_HOST=pma.booking.test
         networks:
             - iae_shared_network

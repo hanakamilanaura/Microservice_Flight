@@ -22,4 +22,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 // GraphQL endpoint
-Route::post('/graphql', [GraphQLController::class, 'handle']);
+Route::post('graphql', [GraphQLController::class, 'handle']);

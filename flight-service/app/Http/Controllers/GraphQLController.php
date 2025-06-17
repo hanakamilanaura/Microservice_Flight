@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\GraphQL\Schema;
-use GraphQL\GraphQL;
+use GraphQL;
 use GraphQL\Error\FormattedError;
 use Illuminate\Http\Request;
 
@@ -24,12 +23,13 @@ class GraphQLController extends Controller
         }
 
         try {
-            $schema = Schema::getSchema();
+            // schema yang telah didaftarkan dalam GraphQL
+            $schema = GraphQL::schema();
             $result = GraphQL::executeQuery(
                 $schema,
                 $query,
-                null,
-                null,
+                null, 
+                null, 
                 $variables
             );
 
@@ -44,4 +44,4 @@ class GraphQLController extends Controller
 
         return response()->json($output);
     }
-} 
+}
