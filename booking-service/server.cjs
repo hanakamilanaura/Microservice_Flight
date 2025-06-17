@@ -3,11 +3,11 @@ const mysql = require('mysql2');
 
 // Koneksi ke database MySQL
 const connection = mysql.createConnection({
-  host: '127.0.0.1',  
-  port: 3306,        
-  user: 'root',      
-  password: '', 
-  database: 'db_user' 
+  host: 'booking_db', 
+  port: 3306,
+  user: 'root',    
+  password: '',      
+  database: 'db_booking',
 });
 
 connection.connect((err) => {
@@ -21,24 +21,26 @@ connection.connect((err) => {
 // Schema GraphQL
 const typeDefs = gql`
   type Query {
-    users: [User]
-    user(id: ID!): User
+    bookings: [Booking]
+    booking(id: ID!): Booking
   }
 
-  type User {
+  type Booking {
     id: ID
-    name: String
-    email: String
+    user_id: Int
+    flight_id: Int
+    ticket_quantity: Int
+    total_price: Float
   }
 `;
 
 // Resolvers untuk mengambil data dari MySQL
 const resolvers = {
   Query: {
-    users: async () => {
-      // data pengguna dari MySQL
+    bookings: async () => {
+      // Mengambil semua data booking dari MySQL
       return new Promise((resolve, reject) => {
-        connection.query('SELECT * FROM users', (err, results) => {
+        connection.query('SELECT * FROM bookings', (err, results) => {
           if (err) {
             reject(err);
           }
@@ -46,17 +48,17 @@ const resolvers = {
         });
       });
     },
-    user: async (parent, args) => {
-      // data pengguna berdasarkan ID dari MySQL
+    booking: async (parent, args) => {
+      // Mengambil data booking berdasarkan ID dari MySQL
       return new Promise((resolve, reject) => {
         connection.query(
-          'SELECT * FROM users WHERE id = ?',
+          'SELECT * FROM bookings WHERE id = ?',
           [args.id],
           (err, results) => {
             if (err) {
               reject(err);
             }
-            resolve(results[0]);  
+            resolve(results[0]);  // Mengembalikan hanya satu hasil berdasarkan ID
           }
         );
       });
@@ -64,9 +66,9 @@ const resolvers = {
   }
 };
 
-// server Apollo
+// Menjalankan server Apollo
 const server = new ApolloServer({ typeDefs, resolvers });
 
-server.listen({ port: 9001 }).then(({ url }) => {
+server.listen({ port: 9003 }).then(({ url }) => {
   console.log(`Server ready at ${url}`);
 });
