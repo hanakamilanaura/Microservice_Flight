@@ -54,11 +54,20 @@ php artisan migrate
 
 - Import file Postman collection (jika ada) ke Postman.
 - Endpoint utama tiap service:
-  - **User Service:** `http://localhost:8001/graphql`
-  - **Flight Service:** `http://localhost:8002/graphql`
-  - **Booking Service:** `http://localhost:8003/graphql`
-  - **Customer Support Service:** `http://localhost:8004/graphql`
-  - **Kel-lain:** (lihat dokumentasi di folder kel-lain)
+
+| Service                      | Local (Manual)         | Docker (Container)         |
+|------------------------------|------------------------|----------------------------|
+| **User Service**             | http://localhost:8001/api|http://localhost:9001/graphql|
+| **Flight Service**           | http://localhost:8002/api|http://localhost:9002/graphql|
+| **Booking Service**          | http://localhost:8003/api|http://localhost:9003/graphql|
+| **Customer Support Service** | http://localhost:8004/api|http://localhost:9004/graphql|
+| **Kel-lain**                 | (lihat dokumentasi di folder kel-lain) | (lihat dokumentasi di folder kel-lain) |
+
+
+**Contoh Request JSON (REST):**
+```json
+GET http://localhost:8001/api
+```
 
 **Contoh Query GraphQL:**
 ```graphql
@@ -69,6 +78,50 @@ query {
     departure
     arrival
   }
+}
+```
+
+### ✅ Flight Service (`http://localhost:8002/api/flights`)
+
+#### POST /
+
+**Body:**
+```json
+{
+  "flightNumber": "GA123",
+  "origin": "Jakarta",
+  "destination": "Surabaya",
+  "departureTime": "2024-06-20T08:00:00Z",
+  "arrivalTime": "2024-06-20T10:00:00Z"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "Flight added successfully",
+  "flightId": 15
+}
+```
+
+#### PUT /{id}
+
+**Body:**
+```json
+{
+  "flightNumber": "GA123",
+  "origin": "Jakarta",
+  "destination": "Bali",
+  "departureTime": "2024-06-20T09:00:00Z",
+  "arrivalTime": "2024-06-20T11:00:00Z"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "Flight updated successfully",
+  "flightId": 15
 }
 ```
 
@@ -114,8 +167,8 @@ query {
    php artisan serve --port=800X
    ```
 5. **Akses GraphQL Playground**
-   - `http://localhost:8001/graphql` (User)
-   - `http://localhost:8002/graphql` (Flight)
+   - `http://localhost:8001/api`      (user)
+   - `http://localhost:8002/api`       (flight)
    - dst.
 
 ---
