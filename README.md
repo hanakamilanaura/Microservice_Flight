@@ -1,80 +1,127 @@
 # Microservice_Flight
 
-Proyek ini adalah sistem microservice berbasis Laravel yang terdiri dari beberapa service utama, saling terhubung menggunakan API (REST/GraphQL) dan dijalankan menggunakan Docker. Setiap service dapat **provide** (menyediakan) dan **consume** (mengakses) data ke/dari service lain, termasuk ke service eksternal di folder `kel-lain`.
+## 📁 Folder Structure
 
-## Daftar Service Laravel
+```
+.
+├── user-service/                # Service User (Laravel)
+├── flight-service/              # Service Penerbangan (Laravel)
+├── booking-service/             # Service Booking (Laravel)
+├── customer-support-service/    # Service Customer Support (Laravel)
+├── kel-lain/                    # Service eksternal ( complaint)
+├── flight-book-frontend/        # Frontend (React/Vite)
+├── docker-compose.yml           # Docker Compose file
+├── README.md                    # Dokumentasi ini
+```
 
-- **user-service**  
-  Mengelola data user (registrasi, login, dsb).
+---
 
-- **flight-service**  
-  Mengelola data penerbangan (jadwal, maskapai, dsb).  
-  Provide data penerbangan ke service lain, dan consume data user/booking jika diperlukan.
+## ⚙️ Installation
 
-- **booking-service**  
-  Mengelola pemesanan tiket.  
-  Consume data penerbangan dan user, serta provide data booking ke service lain.
+### 1. Clone Repository
+```bash
+git clone <repo-url>
+cd Microservice_Flight
+```
 
-- **customer-support-service**  
-  Mengelola komplain dan support pelanggan.  
-  Consume data booking/user, dan provide notifikasi/response ke service lain.
+### 2. Copy & Edit .env
+Untuk setiap service Laravel:
+```bash
+cp .env copy .env
+# Edit konfigurasi DB & APP_KEY jika perlu
+```
 
-- **kel-lain**  
-  Service eksternal (bisa third-party atau service lain di luar ekosistem utama) yang dapat diakses oleh service lain melalui API.
+### 3. Install Dependency
+Untuk setiap service Laravel:
+```bash
+composer install
+```
 
-## Teknologi yang Digunakan
+### 4. Jalankan Docker
+```bash
+docker-compose up -d
+```
 
-- **Laravel** (PHP) untuk masing-masing service
-- **GraphQL** untuk komunikasi data (lihat folder `graphql/` di tiap service)
-- **Docker** untuk containerisasi dan orkestrasi service
-- **REST API** (opsional, jika ada endpoint REST)
-- **MySQL** sebagai database utama (bisa diatur di `.env` masing-masing service)
+### 5. Migrasi Database
+Untuk setiap service Laravel:
+```bash
+php artisan migrate
+```
 
-## Cara Menjalankan Project
+---
 
-1. **Clone repository ini**
-2. **Copy file `.env copy` menjadi `.env`** di setiap service, lalu sesuaikan konfigurasi database dan key.
-3. **Jalankan Docker**  
+## 📄 API Documentation (Postman)
+
+- Import file Postman collection (jika ada) ke Postman.
+- Endpoint utama tiap service:
+  - **User Service:** `http://localhost:8001/graphql`
+  - **Flight Service:** `http://localhost:8002/graphql`
+  - **Booking Service:** `http://localhost:8003/graphql`
+  - **Customer Support Service:** `http://localhost:8004/graphql`
+  - **Kel-lain:** (lihat dokumentasi di folder kel-lain)
+
+**Contoh Query GraphQL:**
+```graphql
+query {
+  getAllFlights {
+    id
+    name
+    departure
+    arrival
+  }
+}
+```
+
+---
+
+## 🛠️ Daftar Layanan (Backend Services)
+
+| Service                    | Deskripsi                                      | Port   |
+|----------------------------|------------------------------------------------|--------|
+| user-service               | Manajemen user (register, login, dsb)          | 8001   |
+| flight-service             | Manajemen data penerbangan                     | 8002   |
+| booking-service            | Manajemen pemesanan tiket                      | 8003   |
+| customer-support-service   | Komplain & support pelanggan, consume kel-lain | 8004   |
+| kel-lain                   | Service eksternal (notifikasi complaint)       | -      |
+
+---
+
+## 🚀 Teknologi yang Digunakan
+
+- **Laravel** (PHP) - Backend utama tiap service
+- **GraphQL** - API utama antar service
+- **Docker & Docker Compose** - Orkestrasi container
+- **MySQL** - Database
+- **Postman** - Dokumentasi & testing API
+- **React + Vite** - Frontend (flight-book-frontend)
+
+---
+
+## ▶️ Langkah Menjalankan Aplikasi
+
+1. **Pastikan Docker & Composer sudah terinstall**
+2. **Jalankan Docker Compose**
    ```bash
    docker-compose up -d
    ```
-4. **Install dependency di masing-masing service**  
-   Masuk ke folder service, lalu:
+3. **Masuk ke masing-masing folder service, install dependency & migrate**
    ```bash
    composer install
-   ```
-5. **Migrasi database**  
-   Di masing-masing service:
-   ```bash
    php artisan migrate
    ```
-6. **Jalankan service Laravel**  
-   Di masing-masing service:
+4. **Jalankan service Laravel (jika tidak pakai Docker)**
    ```bash
-   php artisan serve --port=xxxx
+   php artisan serve --port=800X
    ```
-   (Ganti `xxxx` dengan port yang diinginkan, misal 8001, 8002, dst.)
+5. **Akses GraphQL Playground**
+   - `http://localhost:8001/graphql` (User)
+   - `http://localhost:8002/graphql` (Flight)
+   - dst.
 
-7. **Akses GraphQL Playground**  
-   Biasanya di endpoint `/graphql` atau `/api/graphql` pada masing-masing service.
+---
 
-## Contoh Skema Interaksi
+---
 
-- **booking-service** akan melakukan request ke **flight-service** untuk mendapatkan data penerbangan saat user melakukan booking.
-- **customer-support-service** akan mengakses **booking-service** untuk mendapatkan detail booking saat ada komplain.
-- Semua service bisa saling mengkonsumsi data dari **kel-lain** jika dibutuhkan (misal, untuk validasi eksternal).
-
-## Struktur Folder
-
-- `user-service/`
-- `flight-service/`
-- `booking-service/`
-- `customer-support-service/`
-- `kel-lain/`
-- `flight-book-frontend/` (Frontend, jika ada)
-
-## Catatan
-
-- Pastikan semua service sudah berjalan sebelum melakukan testing integrasi.
-- Untuk pengaturan lebih lanjut, cek file `.env` di masing-masing service.
-- Dokumentasi endpoint GraphQL bisa dilihat di folder `graphql/schema/` dan `graphql/resolvers/` pada tiap service.
+> **Catatan:**  
+> - Pastikan semua service sudah berjalan sebelum melakukan integrasi.
+> - Untuk detail endpoint, cek folder `graphql/schema/` dan `graphql/resolvers/` di masing-masing service.
