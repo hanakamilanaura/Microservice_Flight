@@ -5,16 +5,6 @@ networks:
         external: true
 
 services:
-    user_nginx_proxy:
-        image: jwilder/nginx-proxy
-        container_name: user_nginx_proxy
-        ports:
-            - "8089:80"
-        volumes:
-            - /var/run/docker.sock:/tmp/docker.sock:ro
-        networks:
-            - iae_shared_network
-
     user_web:
         build:
             context: ./
@@ -44,6 +34,12 @@ services:
         environment:
             - REDIS_PORT=6379
             - REDIS_HOST=user_cache
+            - DB_CONNECTION=mysql
+            - DB_HOST=user_db
+            - DB_PORT=3306
+            - DB_DATABASE=db_user
+            - DB_USERNAME=root
+            - DB_PASSWORD=123
         networks:
             - iae_shared_network
 
@@ -54,7 +50,7 @@ services:
             - MYSQL_ROOT_PASSWORD=123
             - MYSQL_DATABASE=db_user
         ports:
-            - "33066:3306"
+            - "33067:3306"
         volumes:
             - user_data:/var/lib/mysql
         networks:
@@ -64,7 +60,7 @@ services:
         image: redis:latest
         container_name: user_cache
         ports:
-            - "63796:6379"
+            - "63795:6379"
         networks:
             - iae_shared_network
 

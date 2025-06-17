@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\UserController;
+use App\GraphQL\Controller\GraphQLController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,3 +19,5 @@ Route::apiResource('users', UserController::class)->except([
 ]);
 
 Route::get('users/{id}/bookings', [UserController::class, 'getBookings']);
+
+Route::post('/graphql', [GraphQLController::class, 'handle']);

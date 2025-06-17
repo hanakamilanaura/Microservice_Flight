@@ -65,7 +65,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Asia/Jakarta',
 
     /*
     |--------------------------------------------------------------------------
@@ -78,9 +78,9 @@ return [
     |
     */
 
-    'locale' => env('APP_LOCALE', 'en'),
+    'locale' => env('APP_LOCALE', 'id'),
 
-    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
+    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'id'),
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
@@ -117,10 +117,9 @@ return [
     | Supported drivers: "file", "cache"
     |
     */
-
+    
     'maintenance' => [
-        'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
+        'driver' => env('APP_MAINTENANCE_DRIVER', 'cache'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
-
 ];

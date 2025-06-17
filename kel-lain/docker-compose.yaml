@@ -1,0 +1,61 @@
+version: "3.8"
+
+networks:
+    iae_shared_network:
+        external: true
+
+services:
+  user-service:
+    image: hudzaiflank/uas:userservice
+    ports:
+      - "4001:4001"
+    depends_on:
+      - central-db
+    networks:
+      - iae_shared_network
+
+  product-service:
+    image: hudzaiflank/uas:productservice
+    ports:
+      - "4002:4002"
+    depends_on:
+      - central-db
+    networks:
+      - iae_shared_network
+
+  complaint-service:
+    image: hudzaiflank/uas:complaintservice
+    ports:
+      - "4003:4003"
+    depends_on:
+      - central-db
+    networks:
+      - iae_shared_network
+
+  notification-service:
+    image: hudzaiflank/uas:notificationservice
+    ports:
+      - "4004:4004"
+    depends_on:
+      - central-db
+    networks:
+      - iae_shared_network
+
+  order-service:
+    image: hudzaiflank/uas:orderservice
+    ports:
+      - "4005:4005"
+    depends_on:
+      - central-db
+    networks:
+      - iae_shared_network
+
+  central-db:
+    image: hudzaiflank/db:withsql
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: user_service_db
+    networks:
+      - iae_shared_network

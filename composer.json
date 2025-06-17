@@ -1,0 +1,6 @@
+{
+    "require": {
+        "webonyx/graphql-php": "^15.19",
+        "rebing/graphql-laravel": "^9.7"
+    }
+}

@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api\CustomerSupportController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use App\Http\Controllers\GraphQLController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,3 +16,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::apiResource('customer_supports', CustomerSupportController::class);
+
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
+
+// GraphQL endpoint
+Route::post('/graphql', [GraphQLController::class, 'handle']);
