@@ -50,7 +50,7 @@ services:
             - MYSQL_ROOT_PASSWORD=123
             - MYSQL_DATABASE=db_user
         ports:
-            - "33067:3306"
+            - "3307:3306"
         volumes:
             - user_data:/var/lib/mysql
         networks:
@@ -69,11 +69,14 @@ services:
         container_name: user_phpmyadmin
         depends_on:
             - user_db
+            - user_cache
         environment:
             - PMA_HOST=user_db
             - PMA_USER=root
             - PMA_PASSWORD=123
             - VIRTUAL_HOST=pma.user.test
+        ports:
+            - "8081:80"
         networks:
             - iae_shared_network
 

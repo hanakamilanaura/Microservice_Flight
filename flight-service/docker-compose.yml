@@ -35,11 +35,11 @@ services:
             - REDIS_PORT=6379
             - REDIS_HOST=flight_cache
             - DB_CONNECTION=mysql
-            - DB_HOST=172.18.0.3
-            - DB_PORT=3306
+            - DB_HOST=flight_db
+            - DB_PORT=3308
             - DB_DATABASE=db_flight
             - DB_USERNAME=root
-            - DB_PASSWORD=
+            - DB_PASSWORD=234
         networks:
             - iae_shared_network
 
@@ -47,10 +47,10 @@ services:
         image: mysql:8.2
         container_name: flight_db
         environment:
-            - MYSQL_ROOT_PASSWORD=
+            - MYSQL_ROOT_PASSWORD=234
             - MYSQL_DATABASE=db_flight
         ports:
-            - "33068:3306"
+            - "3308:3306"
         volumes:
             - flight_data:/var/lib/mysql
         networks:
@@ -70,10 +70,12 @@ services:
         depends_on:
             - flight_db
         environment:
-            - PMA_HOST=172.18.0.3
+            - PMA_HOST=flight_db
             - PMA_USER=root
-            - PMA_PASSWORD=123
+            - PMA_PASSWORD=234
             - VIRTUAL_HOST=pma.flight.test
+        ports:
+            - "8082:80"
         networks:
             - iae_shared_network
 
