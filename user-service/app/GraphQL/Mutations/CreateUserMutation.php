@@ -11,6 +11,7 @@ class CreateUserMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'createUser',
+        'description' => 'Membuat user baru dan password',
     ];
 
     public function type(): Type
@@ -21,23 +22,38 @@ class CreateUserMutation extends Mutation
     public function args(): array
     {
         return [
-            'name' => ['type' => Type::string()],
-            'email' => ['type' => Type::string()],
+            'name' => [
+                'type' => Type::nonNull(Type::string()),
+                'description' => 'Nama lengkap user',
+            ],
+            'email' => [
+                'type' => Type::nonNull(Type::string()),
+                'description' => 'Alamat email user (harus valid)',
+            ],
+            'password' => [
+                'type' => Type::nonNull(Type::string()),
+                'description' => 'Password user (akan di-hash)',
+            ],
         ];
     }
 
     public function resolve($root, $args)
     {
-        // Validasi email
+        // Cek validasi email
         if (!filter_var($args['email'], FILTER_VALIDATE_EMAIL)) {
             throw new \Exception("Invalid email address.");
         }
 
-        // Buat user baru dengan password yang aman
+        // Cek apakah user dengan email itu sudah ada
+        if (User::where('email', $args['email'])->exists()) {
+            throw new \Exception("Email already registered.");
+        }
+
+        // Simpan user baru
         return User::create([
             'name' => $args['name'],
             'email' => $args['email'],
-            'password' => bcrypt('defaultPassword'),  // Atau bisa mengambil password dari argumen
+            'password' => bcrypt($args['password']),
         ]);
     }
 }

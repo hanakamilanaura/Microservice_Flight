@@ -1,21 +1,26 @@
 const { ApolloServer, gql } = require('apollo-server');
 const mysql = require('mysql2');
+require('dotenv').config();
 
-// Koneksi ke database MySQL
-const connection = mysql.createConnection({
-  host: 'booking_db', 
-  port: 3306,
-  user: 'root',    
-  password: '',      
-  database: 'db_booking',
+// Koneksi ke database MySQL menggunakan pool
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
 
-connection.connect((err) => {
+pool.getConnection((err, connection) => {
   if (err) {
     console.error('Error connecting to the database:', err);
     return;
   }
   console.log('Connected to MySQL database!');
+  connection.release();
 });
 
 // Schema GraphQL
@@ -40,7 +45,7 @@ const resolvers = {
     bookings: async () => {
       // Mengambil semua data booking dari MySQL
       return new Promise((resolve, reject) => {
-        connection.query('SELECT * FROM bookings', (err, results) => {
+        pool.query('SELECT * FROM bookings', (err, results) => {
           if (err) {
             reject(err);
           }
@@ -51,7 +56,7 @@ const resolvers = {
     booking: async (parent, args) => {
       // Mengambil data booking berdasarkan ID dari MySQL
       return new Promise((resolve, reject) => {
-        connection.query(
+        pool.query(
           'SELECT * FROM bookings WHERE id = ?',
           [args.id],
           (err, results) => {
